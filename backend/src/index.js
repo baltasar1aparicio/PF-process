@@ -9,11 +9,13 @@ import orderModel from './models/order.js'
 import indexRouter from './routes/index.routes.js'
 import initializePassport from './config/passport.js'
 import varenv from './dotenv.js'
+import { addLogger } from './utils/logger.js'
 import { Server } from 'socket.io'
 import Handlebars from 'handlebars';
 import { engine } from 'express-handlebars'
 import { __dirname } from './path.js'
 import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access'
+
 
 
 
@@ -32,8 +34,7 @@ const io = new Server(server)
 mongoose.connect(varenv.mongo_url)
     .then(() => console.log("DB is connected"))
     .catch(e => console.log(e))
-const resultado = await orderModel.paginate({ status: true }, {limit: 10, page: 1, sort: {price: 'asc'}})
-console.log(resultado)    
+const resultado = await orderModel.paginate({ status: true }, {limit: 10, page: 1, sort: {price: 'asc'}})   
 
 
 //Middlewares
@@ -60,6 +61,7 @@ app.use(session({
     saveUninitialized: true
 }))
 
+app.use(addLogger)
 initializePassport()
 
 app.use(passport.initialize())

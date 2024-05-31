@@ -14,6 +14,7 @@ export const login = async (req, res) => {
         res.status(200).send("Usuario logueado correctamente")
 
     } catch (e) {
+        req.logger.error(e)
         res.status(500).send("Error al loguear usuario")
     }
 }
@@ -27,6 +28,7 @@ export const register = async (req, res) => {
         res.status(200).send("Usuario creado correctamente")
 
     } catch (e) {
+        req.logger.error(e)
         res.status(500).send("Error al registrar usuario")
     }
 

@@ -6,6 +6,7 @@ export const getCart = async (req, res) => {
         const cart = await cartModel.findOne({ _id: cartId })
         res.status(200).send(cart)
     } catch (error) {
+        req.logger.error(e)
         res.status(500).send(`Error interno del servidor al consultar carrito: ${error}`)
     }
 }
@@ -15,6 +16,7 @@ export const createCart = async (req, res) => {
         const mensaje = await cartModel.create({ products: [] })
         res.status(201).send(mensaje)
     } catch (e) {
+        req.logger.error(e)
         res.status(500).send(`Error interno del servidor al crear carrito: ${error}`)
     }
 
@@ -43,6 +45,7 @@ export const insertProductCart = async (req, res) => {
         }
 
     } catch (error) {
+        req.logger.error(e)
         res.status(500).send(`Error interno del servidor al crear producto: ${error}`)
     }
 
@@ -71,6 +74,7 @@ export const createTicket = async (req, res) => {
         }
 
     } catch (e) {
+        req.logger.error(e)
         res.status(500).send(e)
     }
 

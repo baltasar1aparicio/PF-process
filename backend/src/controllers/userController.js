@@ -5,6 +5,7 @@ export const getUsers = async (req, res) => {
         const users = await userModel.find()
         res.status(200).send(users)
     } catch (e) {
+        req.logger.error(e)
         res.status(500).send("Error al consultar users: ", e)
     }
 

@@ -1,4 +1,6 @@
+import e from "express";
 import productModel from "../models/product.js";
+import { addLogger } from "../utils/logger.js";
 
 export const getProducts = async (req, res) => {
     console.log(req)
@@ -19,10 +21,11 @@ export const getProducts = async (req, res) => {
         const ordQuery = ord !== undefined ? { price: ord } : {};
 
         const prods = await productModel.paginate(query, { limit: limi, page: pag, sort: ordQuery });
-
+        
         res.status(200).send(prods)
 
     } catch (error) {
+        req.logger.error(e)
         res.status(500).render('templates/error', {
             error: error,
         });
@@ -39,6 +42,7 @@ export const getProduct = async (req, res) => {
         else
             res.status(404).send("Producto no existe")
     } catch (error) {
+        req.logger.error(e)
         res.status(500).send(`Error interno del servidor al consultar producto: ${error}`)
     }
 }
@@ -57,6 +61,7 @@ export const createProduct = async (req, res) => {
 
 
     } catch (error) {
+        req.logger.error(e)
         res.status(500).send(`Error interno del servidor al crear producto: ${error}`)
     }
 }
@@ -74,6 +79,7 @@ export const updateProduct = async (req, res) => {
 
 
     } catch (error) {
+        req.logger.error(e)
         res.status(500).send(`Error interno del servidor al actualizar producto: ${error}`)
     }
 
@@ -91,6 +97,7 @@ export const deleteProduct = async (req, res) => {
         }
 
     } catch (error) {
+        req.logger.error(e)
         res.status(500).send(`Error interno del servidor al eliminar producto: ${error}`)
     }
 
