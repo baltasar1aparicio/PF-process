@@ -1,4 +1,8 @@
+import { userModel } from "../models/user.js";
 import passport from "passport";
+import { sendEmailChangePassword } from "../utils/nodemailer.js";
+import jwt from 'jsonwebtoken'
+import { validatePassword, createHash } from "../utils/bcrypt.js";
 
 export const login = async (req, res) => {
     try {
@@ -62,4 +66,49 @@ export const testJWT = async (req, res) => {
         res.status(403).send("Usuario no autorizado")
     else
         res.status(200).send(req.user)
+}
+
+export const changePassword = async (req, res) => {
+    const { token } = req.params
+    const { newPassword } = req.body
+
+    try {
+        const validateToken = jwt.verify(token.substr(6,), "coder")
+        const user = await userModel.findOne({email: validateToken.userEmail})
+        if(user) {
+            if(!validatePassword(newPassword, user.password)) {
+                const hashPassword = createHash(newPassword)
+                user.password = hashPassword
+                const resultado = await userModel.findByIdAndUpdate(user._id, user)
+                res.status(200).send("Contraseña modificada correctamente")
+            } else {
+                res.status(400).send("La contraseña no puede ser identica a la anterior")
+
+            }
+        } else {
+            res.status(400).send("Usuario no encontrado")
+        }
+
+    } catch (e) {
+        res.status(500).send(e)
+    }
+}
+export const sendEmailPassword = async (req, res) => {
+
+    try {
+        const { email } = req.body
+        const user = await userModel.find({ email: email })
+        if (user) {
+            const token = jwt.sign({ userEmail: email }, "coder", { expiresIn: '1h' })
+            const resetLink = `http://localhost:9000/api/session/reset-password?token=${token}`
+
+            sendEmailChangePassword(email, resetLink)
+            res.status(200).send("Email enviado correctamente")
+        } else {
+            res.status(400).send("Usuario no encontrado")
+        }
+
+    } catch (e) {
+        res.status(500).send(e)
+    }
 }
