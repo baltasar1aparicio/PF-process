@@ -1,0 +1,209 @@
+openapi: 3.0.0
+info:
+  title: API de Productos
+  description: API para la gestión de productos
+  version: 1.0.0
+
+paths:
+  /api/products/:
+    get:
+      summary: Obtener todos los productos
+      tags:
+        - Products
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: Límite de productos por página
+        - name: page
+          in: query
+          schema:
+            type: integer
+          description: Número de página
+        - name: filter
+          in: query
+          schema:
+            type: string
+          description: Filtro de productos por categoría o estado
+        - name: ord
+          in: query
+          schema:
+            type: string
+          description: Ordenar productos por precio
+      responses:
+        '200':
+          description: Productos obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '500':
+          description: Error al obtener productos
+    post:
+      summary: Crear un nuevo producto
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Datos del nuevo producto
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                category:
+                  type: string
+                status:
+                  type: boolean
+      responses:
+        '201':
+          description: Producto creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '403':
+          description: Usuario no autorizado
+        '500':
+          description: Error al crear producto
+  /api/products/{pid}:
+    get:
+      summary: Obtener un producto
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id del producto a buscar
+      responses:
+        '200':
+          description: Producto obtenido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Producto no existe
+        '500':
+          description: Error al obtener producto
+    put:
+      summary: Actualizar un producto
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id del producto a actualizar
+      requestBody:
+        description: Datos actualizados del producto
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                category:
+                  type: string
+                status:
+                  type: boolean
+      responses:
+        '200':
+          description: Producto actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '403':
+          description: Usuario no autorizado
+        '404':
+          description: Producto no encontrado
+        '500':
+          description: Error al actualizar producto
+    delete:
+      summary: Eliminar un producto
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id del producto a eliminar
+      responses:
+        '200':
+          description: Producto eliminado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '403':
+          description: Usuario no autorizado
+        '404':
+          description: Producto no encontrado
+        '500':
+          description: Error al eliminar producto
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Id autogenerado por MongoDB
+        name:
+          type: string
+          description: Nombre del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        category:
+          type: string
+          description: Categoría del producto
+        status:
+          type: boolean
+          description: Estado del producto (disponible o no)
+      example:
+        _id: '60b8d295f1e4d12d4c8e76e7'
+        name: 'Producto Ejemplo'
+        description: 'Descripción del producto ejemplo'
+        price: 100.0
+        category: 'Categoría Ejemplo'
+        status: true
+
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT

@@ -1,0 +1,40 @@
+openapi: 3.0.0
+info:
+  title: API de Carga de Imágenes
+  description: API para la carga de imágenes de productos
+  version: 1.0.0
+
+paths:
+  /api/multer/:
+    post:
+      summary: Cargar una imagen
+      tags:
+        - Multer
+      requestBody:
+        description: Imagen del producto a cargar
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                product:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Imagen cargada correctamente
+        '500':
+          description: Error al cargar imagen
+
+components:
+  schemas:
+    Image:
+      type: object
+      properties:
+        product:
+          type: string
+          format: binary
+          description: Imagen del producto
+      example:
+        product: (binary)

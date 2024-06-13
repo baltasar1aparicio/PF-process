@@ -1,0 +1,174 @@
+openapi: 3.0.0
+info:
+  title: API de Sesiones
+  description: API para la gestión de sesiones y autenticación de usuarios
+  version: 1.0.0
+
+paths:
+  /api/session/login:
+    get:
+      summary: Iniciar sesión de usuario
+      tags:
+        - Session
+      responses:
+        '200':
+          description: Usuario logueado correctamente
+        '401':
+          description: Usuario o contraseña no válidos
+        '500':
+          description: Error al loguear usuario
+
+  /api/session/register:
+    post:
+      summary: Registrar un nuevo usuario
+      tags:
+        - Session
+      requestBody:
+        description: Datos del nuevo usuario
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Usuario creado correctamente
+        '400':
+          description: Usuario ya existente
+        '500':
+          description: Error al registrar usuario
+
+  /api/session/github:
+    get:
+      summary: Autenticación con GitHub
+      tags:
+        - Session
+      responses:
+        '200':
+          description: Redirige a GitHub para autenticación
+
+  /api/session/githubSession:
+    get:
+      summary: Autenticación de sesión con GitHub
+      tags:
+        - Session
+      responses:
+        '200':
+          description: Usuario autenticado correctamente
+
+  /api/session/logout:
+    get:
+      summary: Cerrar sesión de usuario
+      tags:
+        - Session
+      responses:
+        '200':
+          description: Usuario deslogueado correctamente
+
+  /api/session/testJWT:
+    get:
+      summary: Probar JWT
+      tags:
+        - Session
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: JWT válido
+        '403':
+          description: Usuario no autorizado
+
+  /api/session/sendEmailPassword:
+    post:
+      summary: Enviar email para cambio de contraseña
+      tags:
+        - Session
+      requestBody:
+        description: Email del usuario para enviar el link de cambio de contraseña
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Email enviado correctamente
+        '400':
+          description: Usuario no encontrado
+        '500':
+          description: Error al enviar email
+
+  /api/session/reset-password/{token}:
+    post:
+      summary: Cambiar contraseña
+      tags:
+        - Session
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Token para resetear la contraseña
+      requestBody:
+        description: Nueva contraseña
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Contraseña modificada correctamente
+        '400':
+          description: La contraseña no puede ser idéntica a la anterior o usuario no encontrado
+        '500':
+          description: Error al cambiar contraseña
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Id autogenerado por MongoDB
+        first_name:
+          type: string
+          description: Nombre del usuario
+        last_name:
+          type: string
+          description: Apellido del usuario
+        email:
+          type: string
+          description: Email del usuario
+        password:
+          type: string
+          description: Contraseña del usuario
+      example:
+        _id: '60b8d295f1e4d12d4c8e76e7'
+        first_name: 'Juan'
+        last_name: 'Perez'
+        email: 'juan.perez@example.com'
+        password: 'securePassword'
+
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT

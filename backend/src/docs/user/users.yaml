@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: API de Usuarios
+  description: API para la gestión de usuarios
+  version: 1.0.0
+
+paths:
+  /api/users/:
+    get:
+      summary: Obtener todos los usuarios 
+      tags: 
+        - Users
+      responses:
+        '200':
+          description: Usuarios obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Error al obtener usuarios
+  /api/users/{id}:
+    get: 
+      summary: Obtener un usuario
+      tags: 
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id del usuario a buscar
+      responses:
+        '200':
+          description: Usuario obtenido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Usuario no existe
+        '500':
+          description: Error al obtener usuario
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Id autogenerado por MongoDB
+        first_name:
+          type: string
+          description: Nombre del usuario
+        last_name:
+          type: string
+          description: Apellido del usuario
+        email:
+          type: string
+          description: Email del usuario
+        password: 
+          type: string
+          description: Contraseña del usuario
+      example:
+        _id: '1321ewew22'
+        first_name: Pedro
+        last_name: Parker
+        email: pedro@parker.com
+        password: Maria Jaine
+

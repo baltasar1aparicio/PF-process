@@ -1,0 +1,132 @@
+openapi: 3.0.0
+info:
+  title: API de Carritos
+  description: API para la gestión de carritos de compra
+  version: 1.0.0
+
+paths:
+  /api/cart/:
+    post:
+      summary: Crear un nuevo carrito
+      tags:
+        - Cart
+      responses:
+        '201':
+          description: Carrito creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '500':
+          description: Error interno del servidor al crear carrito
+
+  /api/cart/{cid}:
+    get:
+      summary: Obtener un carrito
+      tags:
+        - Cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id del carrito a buscar
+      responses:
+        '200':
+          description: Carrito obtenido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '404':
+          description: Carrito no existe
+        '500':
+          description: Error interno del servidor al consultar carrito
+
+  /api/cart/{cid}/{pid}:
+    post:
+      summary: Insertar producto en el carrito
+      tags:
+        - Cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id del carrito
+        - name: pid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id del producto
+      requestBody:
+        description: Datos del producto a insertar en el carrito
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+      responses:
+        '200':
+          description: Producto insertado correctamente en el carrito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '403':
+          description: Usuario no autorizado
+        '500':
+          description: Error interno del servidor al insertar producto
+
+  /api/cart/{cid}/purchase:
+    post:
+      summary: Crear ticket de compra
+      tags:
+        - Cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id del carrito
+      responses:
+        '200':
+          description: Compra finalizada correctamente
+        '404':
+          description: Carrito no existe
+        '500':
+          description: Error interno del servidor al crear ticket
+
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Id autogenerado del carrito
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              id_prod:
+                type: string
+                description: Id del producto
+              quantity:
+                type: integer
+                description: Cantidad del producto
+      example:
+        _id: '60b8d295f1e4d12d4c8e76e7'
+        products:
+          - id_prod: '60b8d295f1e4d12d4c8e76e8'
+            quantity: 2
+          - id_prod: '60b8d295f1e4d12d4c8e76e9'
+            quantity: 1
