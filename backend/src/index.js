@@ -4,11 +4,15 @@ import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import passport from 'passport'
 import cookieParser from 'cookie-parser'
+
+import swaggerJSDoc from 'swagger-jsdoc'
+import swaggerUiExpress from 'swagger-ui-express'
 import messageModel from './models/messages.js'
 import orderModel from './models/order.js'
 import indexRouter from './routes/index.routes.js'
 import initializePassport from './config/passport.js'
 import varenv from './dotenv.js'
+
 import { addLogger } from './utils/logger.js'
 import { Server } from 'socket.io'
 import Handlebars from 'handlebars';
@@ -36,6 +40,21 @@ mongoose.connect(varenv.mongo_url)
     .catch(e => console.log(e))
 const resultado = await orderModel.paginate({ status: true }, {limit: 10, page: 1, sort: {price: 'asc'}})   
 
+
+//Swagger
+
+const swaggerOptions = {
+    definition: {
+        openapi: '3.1.0',
+        info: {
+            title: 'Documentacion de mi Aplicacion',
+            description: 'Descripcion de mi documentacion'
+        }
+    },
+    apis: [`${__dirname}/docs/**/*.yaml`]
+}
+
+const specs = swaggerJSDoc(swaggerOptions)
 
 //Middlewares
 
@@ -80,7 +99,7 @@ app.post('/login', (req, res) => {
 //Routes
 
 app.use('/', indexRouter)
-
+app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs))
 //Cookies Routes
 
 app.set('/setCookies', (req, res) => {
