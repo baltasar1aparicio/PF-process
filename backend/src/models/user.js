@@ -31,25 +31,23 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'carts'
     }
-})
+});
 
 userSchema.pre('save', async function (next) {
     try {
-        const newCart = await cartModel.create({products: []})
-        this.cart_id = newCart._id 
+        if (!this.cart_id) {
+            const newCart = await cartModel.create({products: []});
+            this.cart_id = newCart._id;
+        }
+        next();
     } catch (e) {
-        next(e)
+        next(e);
     }
-})
+});
 
-userSchema.pre('findOne', async function(next) {
-    try {
-        const prods = await cartModel.findOne({ _id: '6621e8c7b2a5fedda4006f49'})
-        console.log(prods)
-        this.populate('cart_id')
-    } catch(e) {
-        next(e)
-    }
-})
+userSchema.pre('findOne', function(next) {
+    this.populate('cart_id'); 
+    next();
+});
 
-export const userModel = model("users", userSchema)
+export const userModel = model("users", userSchema);
